@@ -110,7 +110,7 @@ export default function CardSection() {
                 </div>
 
                 <Link 
-                  href={`/items/${item._id}`} 
+                  href={`/agents/${item._id}`} 
                   className="w-full mt-2 inline-flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-blue-600 hover:text-white text-gray-800 dark:text-gray-200 font-semibold py-2.5 rounded-xl text-xs transition-all duration-300 group-hover:shadow-md"
                 >
                   View Details <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
