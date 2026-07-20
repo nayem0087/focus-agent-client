@@ -14,7 +14,7 @@ export function StatsSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-24 bg-white dark:bg-gray-950 transition-colors duration-300 w-full">
+    <section ref={ref} className="md:py-24 py-12 bg-white dark:bg-gray-950 transition-colors duration-300 w-full">
   
       <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
         
