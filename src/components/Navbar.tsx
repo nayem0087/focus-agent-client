@@ -75,11 +75,11 @@ export default function Navbar() {
         {/* Desktop Links (লগআউট অবস্থায় ৩টি, লগইন অবস্থায় ৫টি রুট) */}
         <div className="hidden md:flex items-center gap-8 text-gray-600 dark:text-gray-300 font-medium">
           <Link href="/" className="hover:text-blue-600 transition">Home</Link>
-          <Link href="/explore" className="hover:text-blue-600 transition">Explore</Link>
+          <Link href="/agents" className="hover:text-blue-600 transition">Browse Agents</Link>
           
           {isLoggedIn ? (
             <>
-              <Link href="/dashboard" className="hover:text-blue-600 transition">Dashboard</Link>
+              <Link href="/add-agent" className="hover:text-blue-600 transition">Add Agent</Link>
               <Link href="/items/manage" className="hover:text-blue-600 transition">Manage</Link>
               <Link href="/about" className="hover:text-blue-600 transition">About</Link>
             </>
@@ -142,7 +142,7 @@ export default function Navbar() {
         {isOpen && (
           <div className="absolute top-20 left-0 w-full bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 p-6 flex flex-col gap-4 md:hidden shadow-lg">
             <Link href="/" className="text-lg font-medium dark:text-white" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link href="/explore" className="text-lg font-medium dark:text-white" onClick={() => setIsOpen(false)}>Explore</Link>
+            <Link href="/explore" className="hover:text-blue-600 transition">AI Agents</Link>
             
             {isLoggedIn ? (
               <>

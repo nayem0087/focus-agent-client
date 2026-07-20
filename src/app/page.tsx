@@ -1,4 +1,3 @@
-
 import { FaqCtaSection } from "@/components/FAQ";
 import { FeaturesSection } from "@/components/Features";
 import Hero from "@/components/Hero";
