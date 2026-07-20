@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sun, Moon, LogIn, LogOut, Menu, X } from 'lucide-react';
+import { Cpu } from '@gravity-ui/icons';
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -33,13 +34,19 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false }) => {
 
   return (
     <nav className="w-full h-20 flex items-center justify-between px-4 md:px-8 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 sticky top-0 z-50 transition-colors duration-300">
-      
+
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <div className="bg-blue-600 text-white font-bold w-10 h-10 flex items-center justify-center rounded-lg text-xl">F</div>
-        <span className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-          Focus<span className="text-blue-600">Agent</span>
-        </span>
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex md:h-12 h-8 md:w-12 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-500 shadow-md">
+            <span className="text-base font-black text-white tracking-wider">
+              <Cpu />
+            </span>
+          </div>
+          <span className="md:text-4xl text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Focus<span className="text-blue-600">Agent</span>
+          </span>
+        </Link>
       </div>
 
       {/* Desktop Links */}
@@ -53,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn = false }) => {
       {/* Actions */}
       <div className="flex items-center gap-4">
         {/* Theme Toggle Button */}
-        <button 
+        <button
           onClick={toggleTheme}
           className="p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition"
           aria-label="Toggle Theme"
