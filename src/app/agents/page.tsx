@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Star, MapPin, Calendar, ArrowRight, Tag } from 'lucide-react';
+import { Star, MapPin, Calendar, ArrowRight, Tag, Search, SlidersHorizontal } from 'lucide-react';
 
 interface Item {
   _id: string;
@@ -15,9 +15,18 @@ interface Item {
   image: string;
 }
 
-export default function CardSection() {
+export default function ExploreSection() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // --- Filtering & Sorting States ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('All');
+  const [sortBy, setSortBy] = useState('default');
+
+  // --- Pagination States ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; 
 
   useEffect(() => {
     fetch('http://localhost:5000/api/items')
@@ -32,8 +41,35 @@ export default function CardSection() {
       });
   }, []);
 
+  const filteredItems = items.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesLocation = selectedLocation === 'All' || item.location.includes(selectedLocation);
+    return matchesSearch && matchesLocation;
+  });
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (sortBy === 'rating-high') return b.rating - a.rating;
+    if (sortBy === 'price-low') {
+      const priceA = parseFloat(a.price.replace(/[^0-9.]/g, '')) || 0;
+      const priceB = parseFloat(b.price.replace(/[^0-9.]/g, '')) || 0;
+      return priceA - priceB;
+    }
+    if (sortBy === 'price-high') {
+      const priceA = parseFloat(a.price.replace(/[^0-9.]/g, '')) || 0;
+      const priceB = parseFloat(b.price.replace(/[^0-9.]/g, '')) || 0;
+      return priceB - priceA;
+    }
+    return 0;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+
   return (
-    <section className="w-full py-16 px-4 md:px-8 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <section className="w-full py-16 px-4 md:px-8 bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen">
       <div className="max-w-[90%] mx-auto space-y-10">
 
         <div className="text-center space-y-3">
@@ -43,6 +79,52 @@ export default function CardSection() {
           <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
             Discover cutting-edge autonomous tools engineered to elevate your engineering productivity.
           </p>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 md:p-6 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center gap-4 justify-between">
+
+          <div className="relative w-full md:w-1/3">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Search agents or tools..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2 flex-1 md:flex-initial">
+              <span className="text-xs font-semibold text-gray-500 hidden sm:inline">Location:</span>
+              <select 
+                value={selectedLocation}
+                onChange={(e) => { setSelectedLocation(e.target.value); setCurrentPage(1); }}
+                className="w-full md:w-auto px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="All">All Locations</option>
+                <option value="Cloud">Cloud / Remote</option>
+                <option value="Global">Global</option>
+                <option value="Dedicated">Dedicated Server</option>
+                <option value="Edge">Edge Cluster</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 flex-1 md:flex-initial">
+              <SlidersHorizontal size={14} className="text-gray-400 hidden sm:inline" />
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full md:w-auto px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+              >
+                <option value="default">Sort By: Featured</option>
+                <option value="rating-high">Highest Rated</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -62,18 +144,20 @@ export default function CardSection() {
                 <div className="h-10 bg-gray-200 dark:bg-gray-800 rounded-xl w-full" />
               </div>
             ))
+          ) : currentItems.length === 0 ? (
+            <div className="col-span-full text-center py-20 text-gray-500 dark:text-gray-400">
+              <p className="text-base font-bold">No agents or solutions found matching your criteria.</p>
+            </div>
           ) : (
-  
-            items.map((item, index) => (
+            currentItems.map((item, index) => (
               <motion.div
                 key={item._id || index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
                 whileHover={{ y: -8 }}
                 className="h-[430px] rounded-[2rem] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 flex flex-col justify-between shadow-lg shadow-gray-200/50 dark:shadow-none transition-all duration-300 group"
               >
-
                 <div className="relative w-full h-48 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
                   <img 
                     src={item.image} 
@@ -120,6 +204,25 @@ export default function CardSection() {
           )}
 
         </div>
+
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-6">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-10 h-10 rounded-xl text-xs font-bold transition-all ${
+                  currentPage === i + 1
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                    : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
+
       </div>
     </section>
   );
