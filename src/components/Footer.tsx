@@ -46,9 +46,9 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Navigation</h4>
             <ul className="space-y-2.5 text-sm">
               <li><Link href="/" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Home</Link></li>
-              <li><Link href="/explore" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Explore Tasks</Link></li>
+              <li><Link href="/agents" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Browse Agents</Link></li>
               <li><Link href="/about" className="hover:text-blue-600 dark:hover:text-white transition duration-200">About Us</Link></li>
-              <li><Link href="/login" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Get Started</Link></li>
+              <li><Link href="/register" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Get Started</Link></li>
             </ul>
           </div>
 
@@ -56,9 +56,9 @@ export default function Footer() {
           <div className="lg:col-span-3 space-y-4">
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white tracking-wider uppercase">Dashboard</h4>
             <ul className="space-y-2.5 text-sm">
-              <li><Link href="/items/add" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Add New Task</Link></li>
-              <li><Link href="/items/manage" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Manage Tasks</Link></li>
-              <li><Link href="/explore" className="hover:text-blue-600 dark:hover:text-white transition duration-200">AI Recommendations</Link></li>
+              <li><Link href="/add-agent" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Add New Task</Link></li>
+              <li><Link href="/manage" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Manage Tasks</Link></li>
+              <li><Link href="/agents" className="hover:text-blue-600 dark:hover:text-white transition duration-200">AI Recommendations</Link></li>
               <li><Link href="/about" className="hover:text-blue-600 dark:hover:text-white transition duration-200">Support Center</Link></li>
             </ul>
           </div>

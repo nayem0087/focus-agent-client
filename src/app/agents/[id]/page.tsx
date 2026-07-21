@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Star, MapPin, Calendar, Tag, ArrowLeft, ShieldCheck, Cpu, MessageSquare, Sparkles, Send, Bot, User, RefreshCw, Copy, Check } from 'lucide-react';
+import { Star, MapPin, Calendar, Tag, ArrowLeft, ShieldCheck, Cpu, Sparkles, Send, Bot, User, Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { authClient } from '@/lib/auth-client';
 
 interface Item {
   _id: string;
@@ -25,12 +25,15 @@ interface Message {
 export default function AgentDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  
+
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
+  const isLoggedIn = !!session?.user;
+
   const [item, setItem] = useState<Item | null>(null);
   const [relatedItems, setRelatedItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- AI Content Generator States ---
+  // AI Content Generator states
   const [promptTopic, setPromptTopic] = useState('');
   const [contentType, setContentType] = useState('Blog Post');
   const [outputLength, setOutputLength] = useState('Medium');
@@ -38,16 +41,23 @@ export default function AgentDetailsPage() {
   const [generatingContent, setGeneratingContent] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // --- AI Chat Assistant States ---
+  // AI Chat Assistant states
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
- useEffect(() => {
-    if (!id) return;
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (sessionLoading) return;
+    if (!isLoggedIn) {
+      router.replace(`/login?redirect=/agents/${id}`);
+    }
+  }, [sessionLoading, isLoggedIn, router, id]);
 
-    // সব আইটেম একসাথে এনে সেখান থেকে বর্তমান আইডি ম্যাচ করা
+  useEffect(() => {
+    if (!id || !isLoggedIn) return;
+
     fetch('http://localhost:5000/api/items')
       .then((res) => res.json())
       .then((data: Item[]) => {
@@ -68,13 +78,12 @@ export default function AgentDetailsPage() {
         console.error("Error fetching items:", err);
         setLoading(false);
       });
-  }, [id]);
+  }, [id, isLoggedIn]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // AI Content Generator Handler (Simulated Advanced Reasoning & Template Processing)
   const handleGenerateContent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptTopic.trim()) {
@@ -106,11 +115,10 @@ export default function AgentDetailsPage() {
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedContent);
     setCopied(true);
-    toast.copied ? null : toast.success("Copied to clipboard!");
+    toast.success("Copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // AI Chat Assistant Handler
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -132,6 +140,15 @@ export default function AgentDetailsPage() {
       setIsTyping(false);
     }, 1000);
   };
+
+  // Auth still resolving, or user not logged in and about to be redirected
+  if (sessionLoading || !isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="text-xs font-semibold text-gray-400 animate-pulse">Checking session...</div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -163,18 +180,16 @@ export default function AgentDetailsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4 md:px-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-12">
-        
-        {/* ব্যাক বাটন */}
-        <button 
+
+        <button
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition"
         >
           <ArrowLeft size={16} /> Back to Listings
         </button>
 
-        {/* মেইন ডিটেইলস সেকশন */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="rounded-[2.5rem] overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-3"
@@ -188,7 +203,7 @@ export default function AgentDetailsPage() {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
@@ -228,12 +243,9 @@ export default function AgentDetailsPage() {
           </motion.div>
         </div>
 
-        {/* ======================================================== */}
-        {/* FEATURE 1: AI Content Generator & FEATURE 2: AI Chatbot */}
-        {/* ======================================================== */}
         <div id="ai-tools-section" className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
-          
-          {/* A. AI Content Generator */}
+
+          {/* AI Content Generator */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-[2.5rem] p-6 md:p-8 space-y-6 shadow-sm flex flex-col justify-between">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 text-xs font-bold border border-purple-200 dark:border-purple-800">
@@ -247,7 +259,7 @@ export default function AgentDetailsPage() {
               <div className="space-y-3">
                 <div>
                   <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Content Type</label>
-                  <select 
+                  <select
                     value={contentType}
                     onChange={(e) => setContentType(e.target.value)}
                     className="w-full mt-1 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
@@ -261,7 +273,7 @@ export default function AgentDetailsPage() {
 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Output Length</label>
-                  <select 
+                  <select
                     value={outputLength}
                     onChange={(e) => setOutputLength(e.target.value)}
                     className="w-full mt-1 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
@@ -274,7 +286,7 @@ export default function AgentDetailsPage() {
 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Custom Prompt / Topic</label>
-                  <input 
+                  <input
                     type="text"
                     required
                     value={promptTopic}
@@ -285,7 +297,7 @@ export default function AgentDetailsPage() {
                 </div>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={generatingContent}
                 className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
@@ -309,7 +321,7 @@ export default function AgentDetailsPage() {
             )}
           </div>
 
-          {/* C. AI Chat Assistant */}
+          {/* AI Chat Assistant */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-[2.5rem] p-6 md:p-8 space-y-6 shadow-sm flex flex-col justify-between h-[520px]">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-800">
@@ -319,7 +331,6 @@ export default function AgentDetailsPage() {
               <p className="text-xs text-gray-500 dark:text-gray-400">Context-aware conversational assistant with history.</p>
             </div>
 
-            {/* চ্যাট কনভারসেশন বক্স */}
             <div className="flex-1 overflow-y-auto space-y-3 pr-2 my-2 scrollbar-thin">
               {messages.map((msg, index) => (
                 <div key={index} className={`flex items-start gap-2 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
@@ -340,8 +351,8 @@ export default function AgentDetailsPage() {
             </div>
 
             <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Ask this agent anything..."
