@@ -34,7 +34,7 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      image: { type: "string", required: false }, // সাইন-আপ পেজের প্রোফাইল ইমেজ রিসিভ করার জন্য এটি যোগ করা হয়েছে
+      image: { type: "string", required: false },
       role: { type: "string", defaultValue: "user" },
       plan: { type: "string", defaultValue: "user_free" },
       blocked: { type: "boolean", defaultValue: false },

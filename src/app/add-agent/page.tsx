@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowLeft, Send } from 'lucide-react';
@@ -19,12 +19,6 @@ export default function AddItemPage() {
     image: ''
   });
 
-  useEffect(() => {
-    const userLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!userLoggedIn) {
-    }
-  }, [router]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -34,19 +28,25 @@ export default function AddItemPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/items', {
+      const response = await fetch('/api/items', {
         method: 'POST',
+        credentials: 'include', // সেশন কুকি পাঠানোর জন্য জরুরি — এটা ছাড়া userEmail null আসবে
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         toast.success("Agent added successfully!");
-        router.push('/agents'); 
+        router.push('/agents');
+      } else if (response.status === 401) {
+        toast.error("Please log in first to add an agent.");
+        router.push('/login');
       } else {
-        throw new Error("Failed to add item");
+        throw new Error(data.error || "Failed to add item");
       }
     } catch (err) {
       console.error(err);

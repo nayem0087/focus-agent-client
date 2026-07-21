@@ -1,6 +1,7 @@
-// src/app/api/items/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth"; 
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,55 @@ export async function GET() {
 
     return NextResponse.json(serialized);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to fetch items";
+    const message =
+      err instanceof Error ? err.message : "Failed to fetch items";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "You must be logged in to add an item" },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const { title, description, price, date, rating, location, image } = body;
+
+    if (!title || !description || !price || !location) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const connectedClient = await clientPromise;
+    const db = connectedClient.db(dbName);
+
+    const result = await db.collection("items").insertOne({
+      title,
+      description,
+      price,
+      date: date || new Date().toDateString(),
+      rating: Number(rating) || 5,
+      location,
+      image: image || "",
+      userEmail: session.user.email, 
+      createdAt: new Date(),
+    });
+
+    return NextResponse.json({
+      success: true,
+      insertedId: result.insertedId.toString(),
+    });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Failed to add item";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

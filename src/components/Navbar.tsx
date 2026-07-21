@@ -72,7 +72,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Links (লগআউট অবস্থায় ৩টি, লগইন অবস্থায় ৫টি রুট) */}
         <div className="hidden md:flex items-center gap-8 text-gray-600 dark:text-gray-300 font-medium">
           <Link href="/" className="hover:text-blue-600 transition">Home</Link>
           <Link href="/agents" className="hover:text-blue-600 transition">Browse Agents</Link>
@@ -80,7 +79,7 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link href="/add-agent" className="hover:text-blue-600 transition">Add Agent</Link>
-              <Link href="/items/manage" className="hover:text-blue-600 transition">Manage</Link>
+              <Link href="/manage" className="hover:text-blue-600 transition">Manage</Link>
               <Link href="/about" className="hover:text-blue-600 transition">About</Link>
             </>
           ) : (
