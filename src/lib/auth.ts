@@ -16,7 +16,7 @@ const db = client.db(process.env.AUTH_DB_NAME as string);
 export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
-    "https://nexus-gear-pink.vercel.app",
+    "https://focus-agent-client.vercel.app", 
   ],
 
   database: mongodbAdapter(db, { client }),

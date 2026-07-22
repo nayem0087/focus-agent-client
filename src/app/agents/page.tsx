@@ -29,7 +29,7 @@ export default function ExploreSection() {
   const itemsPerPage = 8; 
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/items')
+    fetch('https://focus-agent-server.vercel.app/api/items')
       .then((res) => res.json())
       .then((data) => {
         setItems(data);

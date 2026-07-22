@@ -46,16 +46,16 @@ const Hero = () => {
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
           <Link 
-            href="/items/add" 
+            href="/register" 
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5"
           >
             Get Started Free <ArrowRight size={18} />
           </Link>
           <Link 
-            href="/explore" 
+            href="/agents" 
             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold px-8 py-3 rounded-full transition-all"
           >
-            Explore Tasks
+            Browse Agents
           </Link>
         </div>
 

@@ -2,8 +2,8 @@
 
 FocusAgent is a full-stack Agentic AI platform where users can discover, deploy, and manage AI-powered focus and productivity agents. This repository contains the **client (frontend)** application.
 
-**Live Site:** [https://focusagent.app](https://focusagent.app)
-**Server Repository:** [FocusAgent — Server](../server)
+**Live Site:** https://focus-agent-client.vercel.app
+**Server Repository:** https://github.com/nayem0087/focus-agent-client
 
 ---
 
@@ -93,7 +93,7 @@ npm install
 Create a `.env.local` file in the root directory:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
+NEXT_PUBLIC_API_BASE_URL=https://focus-agent-server.vercel.app
 NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 BETTER_AUTH_SECRET=your_better_auth_secret
 GOOGLE_CLIENT_ID=your_google_client_id
